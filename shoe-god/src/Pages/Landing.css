@@ -1,0 +1,14 @@
+.landing-img img{
+   /*  border-image: url('../Assets/landing_yeezy.jpg') 30; */
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width:700px;
+    position: relative;
+    z-index: 15;
+}
+.landing-img{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
