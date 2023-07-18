@@ -16,16 +16,12 @@ import {
 import SearchBar from "./Components/SearchBar";
 import PopularBanner from "./Components/PopularBanner";
 import sneaker_text_logo from "../../assets/sneaker_text_logo.png";
+import HomeItems from "./Components/HomeItems";
 
 const Home = () => {
   return (
     <ScrollView style={styles.bg}>
       <SafeAreaView style={styles.notification_container}>
-        <Image
-          source={sneaker_text_logo}
-          style={{ position: "relative", left: 120 }}
-        />
-
         <Ionicons
           name="notifications-outline"
           size={30}
@@ -33,6 +29,8 @@ const Home = () => {
           style={styles.notification_icon}
         />
       </SafeAreaView>
+      <PopularBanner />
+      <HomeItems/>
     </ScrollView>
   );
 };

@@ -13,8 +13,12 @@ import axios from "axios";
 import "react-native-url-polyfill/auto";
 import Toast from "react-native-root-toast";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { loginSuccess, logoutSuccess } from "../authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigation();
 
   const errorToast = (toast) => {
@@ -44,6 +48,9 @@ const Login = () => {
         navigate.navigate("TabNavigator");
         console.log(response);
         setisLoading(false);
+        const token  = response.data.body.token;
+        AsyncStorage.setItem("loginToken", token );
+        dispatch(loginSuccess(token));
       })
       .catch((error) => {
         console.log(error.response);

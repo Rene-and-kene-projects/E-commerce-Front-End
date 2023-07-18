@@ -18,11 +18,50 @@ import ViewItem from "./Screens/View Item/ViewItem";
 import SignUp from "./User-Control/SignUp";
 import Login from "./User-Control/Login";
 import { RootSiblingParent } from "react-native-root-siblings";
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "./authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess, logoutSuccess } from "./authSlice";
+import { useEffect } from "react";
+import { PersistGate } from "redux-persist/integration/react";
+import { stor, persistor } from "./store";
+import { AppRegistry } from "react-native";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+const store = configureStore({
+  reducer: {
+    auth: authReducer,
+  },
+});
+
 const TabNavigator = () => {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem("loginToken");
+
+        if (token) {
+          // If a token is present, dispatch the loginSuccess action with the token
+          dispatch(loginSuccess(token));
+        } else {
+          // If no token is present, dispatch the logoutSuccess action to reset the login state
+          dispatch(logoutSuccess());
+        }
+      } catch (error) {
+        // Handle AsyncStorage read error
+        console.error("AsyncStorage read error:", error);
+      }
+    };
+
+    checkToken();
+  }, [dispatch]);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -103,37 +142,39 @@ const TabNavigator = () => {
     </Tab.Navigator>
   );
 };
-export default function App() {
+const App = () => {
   return (
-    <RootSiblingParent>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="TabNavigator"
-            component={TabNavigator}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="viewitem"
-            component={ViewItem}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="signup"
-            component={SignUp}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="login"
-            component={Login}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </RootSiblingParent>
+    <Provider store={store}>
+      <RootSiblingParent>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="TabNavigator"
+              component={TabNavigator}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="viewitem"
+              component={ViewItem}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="signup"
+              component={SignUp}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="login"
+              component={Login}
+              options={{ headerShown: false }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </RootSiblingParent>
+    </Provider>
   );
-}
-
+};
+AppRegistry.registerComponent("App", () => ReduxApp);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -142,3 +183,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default App;
